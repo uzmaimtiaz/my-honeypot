@@ -1,32 +1,37 @@
 import os
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Optional
 
 app = FastAPI()
 
-# This looks for the 'MY_SECRET_KEY' you saved in Render's "Environment Variables"
+# This pulls the key from your Render Environment Variables
 MY_SECRET_KEY = os.getenv("MY_SECRET_KEY")
 
+# This is the "Shape" of the data GUVI sends. 
+# If this is missing, you get the 'INVALID_REQUEST_BODY' error.
 class Message(BaseModel):
     sender: str
     text: str
-    timestamp: int
 
 class ScamRequest(BaseModel):
     sessionId: str
     message: Message
-    conversationHistory: List[dict] = []
-    metadata: Optional[dict] = {}
+    conversationHistory: Optional[List[dict]] = []
 
 @app.post("/chat")
 async def handle_scam(request: ScamRequest, x_api_key: str = Header(None)):
-    # Verify the password
+    # 1. Check the API Key
     if x_api_key != MY_SECRET_KEY:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+        raise HTTPException(status_code=401, detail="Invalid API Key")
     
-    # LEVEL 1 RESPONSE: Simple success message for the GUVI tester
+    # 2. Level 1 Response: Just a simple reply to pass the test
     return {
         "status": "success",
-        "reply": "I don't understand. Why would my account be blocked?"
+        "reply": "Wait, I don't understand. Who is this?"
     }
+
+# Optional: Add a simple GET route so you can check if the site is up in your browser
+@app.get("/")
+async def root():
+    return {"message": "Honeypot is Live!"}
