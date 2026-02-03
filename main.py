@@ -19,12 +19,17 @@ async def chat(request: Request):
             status_code=401, 
             content={"detail": "Unauthorized - Key Mismatch"}
         )
+        
     
     # 4. Success Response
-    return {
-        "status": "success",
-        "reply": "Wait, I don't understand. Why would my account be blocked?"
-    }
+    
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "success",
+            "reply": "I'm sorry, I don't understand. Why would my account be blocked?"
+        }
+    )
 
 @app.get("/")
 async def root():
