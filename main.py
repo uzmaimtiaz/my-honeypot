@@ -16,15 +16,15 @@ class Message(BaseModel):
     timestamp: int
 
 class Metadata(BaseModel):
-    channel: str
-    language: str
-    locale: str
+    channel: Optional[str] = None
+    language: Optional[str] = None
+    locale: Optional[str] = None
 
 class ScamRequest(BaseModel):
-    sessionId: str
-    message: Message
-    conversationHistory: List[Message]
-    metadata: Optional[Metadata]
+   sessionId: str
+   message: Message
+   conversationHistory: List[Message] = []
+   metadata: Optional[Metadata] = None
 
 # --- Intelligence Extraction Helper ---
 async def send_final_callback(payload: dict):
