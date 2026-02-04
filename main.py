@@ -1,3 +1,4 @@
+import os  # Added to read environment variables
 from fastapi import FastAPI, Header, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from typing import List, Optional
@@ -5,9 +6,8 @@ import httpx
 
 app = FastAPI()
 
-# 1. DEFINE YOUR SECRET KEY HERE
-# This is the key you will submit to the Honeypot API Endpoint Tester
-YOUR_SECRET_API_KEY = "SUPER_SECRET_HONEYPOT_KEY_2026"
+# This now pulls from the "MY_API_KEY" variable you set in the Render Dashboard
+YOUR_SECRET_API_KEY = os.getenv("MY_API_KEY")
 
 # --- Data Models ---
 class Message(BaseModel):
@@ -52,18 +52,13 @@ async def handle_scam(
         raise HTTPException(status_code=401, detail="Invalid API Key")
 
     # 3. SCAM DETECTION & AGENT LOGIC
-    # Placeholder Logic: In a real scenario, use an LLM here.
     incoming_text = request.message.text.lower()
     
-    # Simple example of detecting scam intent
     is_scam = any(word in incoming_text for word in ["block", "verify", "urgent", "bank"])
     
     if is_scam:
-        # Example Response to keep the scammer talking
         bot_reply = "Oh no! Which bank is this? I need my account for my pension."
         
-        # Trigger the mandatory callback if intelligence is gathered
-        # (Usually done after a few turns, but here is the structure)
         final_data = {
             "sessionId": request.sessionId,
             "scamDetected": True,
